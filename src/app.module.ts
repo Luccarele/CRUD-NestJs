@@ -5,9 +5,13 @@ import { StudentModule } from './student/student.module';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config'
 
 @Module({
-  imports: [StudentModule, AuthModule],
+  imports: [ConfigModule.forRoot({
+    isGlobal: true
+  })
+    ,StudentModule, AuthModule],
   controllers: [AppController, AuthController],
   providers: [AppService, AuthService],
 })

@@ -1,23 +1,54 @@
+import { Type } from "class-transformer";
+import { IsBoolean, IsDate, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString, Length, ValidateNested } from "class-validator";
+
 //* Class for Profile.
 export class Profile {
-    username: string;
-    email: string;
-    phoneNumber: string;
-    registrationDate: Date;
+  @IsString()
+  @IsNotEmpty()
+  username: string;
 
-    constructor(username: string, email: string, phoneNumber: string, registrationDate: Date) {
-        this.username = username;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.registrationDate = registrationDate;
-    }
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+
+  @IsPhoneNumber(null)
+  phoneNumber: string;
+
+  @IsDate()
+  @Type(() => Date)
+  readonly registrationDate: Date;
+
+  constructor(username: string, email: string, password: string, phoneNumber: string) {
+      this.username = username;
+      this.email = email;
+      this.password = password;
+      this.phoneNumber = phoneNumber;
+      this.registrationDate = new Date();
+  }
 }
+
 
 //* Class for Address 
 export class Address {
+
+    @IsString()
+    @IsNotEmpty()
     street: string;
+
+    @IsString()
+    @IsNotEmpty()
     city: string;
+
+    @IsString()
+    @IsNotEmpty()
     state: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @Length(8, 8)
     zip: string;
 
     constructor(street: string, city: string, state: string, zip: string) {
@@ -28,25 +59,64 @@ export class Address {
     }
 }
 
+export enum PlanType {
+  Silver = 'Silver',
+  Gold = 'Gold',
+  Diamond = 'Diamond'
+}
+
+export enum GenderType {
+  Male = 'Male',
+  Female = 'Female',
+  NotBinary = 'NotBinary',
+  Fluid = 'Fluid',
+  Agender = 'Agender',
+  Bigender = 'Bigender'
+}
+
 //* Class for StudentDto
 export class StudentDto {
+
+  @IsString()
+  @IsOptional()
   id: string;
+
+  @IsString()
+  @IsNotEmpty()
   fullName: string;
-  gender: string;
+
+  @IsEnum(GenderType)
+  @IsNotEmpty()
+  gender: GenderType;
+
+  @IsNumber()
+  @IsNotEmpty()
   age: number;
+
+  @ValidateNested()
+  @Type(() => Address)
   address: Address;
-  plan: string;
+
+  @IsEnum(PlanType)
+  @IsNotEmpty()
+  plan: PlanType;
+
+  @IsString()
+  @IsNotEmpty()
   paymentStatus: string;
+
+  @IsBoolean()
   authorizationAndTerms: boolean;
+
   profiles: Profile[];
 
   constructor(
     id: string,
     fullName: string,
-    gender: string,
+    gender: GenderType,
     age: number,
     address: Address,
-    plan: string,
+    plan: PlanType,
     paymentStatus: string,
     authorizationAndTerms: boolean,
     profiles: Profile[]

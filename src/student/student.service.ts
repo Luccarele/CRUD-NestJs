@@ -1,6 +1,8 @@
 import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Profile, StudentDto, findAllParameters } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { hashSync as bcryptHashSync} from 'bcrypt';
+import { nanoid } from 'nanoid';
 
 @Injectable()
 export class StudentService {
@@ -8,6 +10,10 @@ export class StudentService {
     private students: StudentDto[] = [];
 
   create(student: StudentDto) {
+    student.id = `Student_${nanoid(5)}`
+    student.profiles.forEach(profile => {
+      profile.password = bcryptHashSync(profile.password, 10);
+    });
     this.students.push(student);
     console.log(JSON.stringify(this.students, null, 2));
   }
@@ -61,11 +67,11 @@ export class StudentService {
     }
   }
 
-  findStudentLogin(username: string): Profile | null {
+  findStudentLogin(username: string): {student: StudentDto, profile: Profile} | null {
    for (const student of this.students) {
     const profile = student.profiles.find(profile => profile.username === username);
     if(profile) {
-      return profile;
+      return {student, profile}
     };
    };
    return null;
